@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-vangen:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+    - run: |
+        yq -o=json vangen.yml > vangen.json
+    - run: |
+        mkdir bin
+        cd bin
+        curl -sSfL -o vangen.tar.gz \
+          https://github.com/leighmcculloch/vangen/releases/download/v1.4.0/vangen_1.4.0_linux_amd64.tar.gz
+        echo 'b481603ac4c94478c05a0e5b3c21db163822f2526496143847c03145b66247b6  vangen.tar.gz' \
+          | sha256sum --check
+        tar -xvzf vangen.tar.gz
+    - run: ./bin/vangen
+    - run: mv ./static/index.html ./vangen/
+    - uses: actions/upload-pages-artifact@v1
+      with:
+        path: vangen
+
+  deploy-pages:
+    runs-on: ubuntu-22.04
+    needs: build-vangen
+    permissions:
+      pages: write     # to deploy to Pages
+      id-token: write  # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/deploy-pages@v1
+      id: deploy
