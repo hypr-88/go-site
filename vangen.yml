@@ -1,0 +1,5 @@
+domain: go.hyper88.io
+repositories:
+  - type: git
+    prefix: safe-gateway-go-sdk
+    url: https://github.com/hypr-88/safe-gateway-go-sdk
