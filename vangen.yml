@@ -1,4 +1,4 @@
-domain: go.hyper88.io
+domain: hypr-88.github.io/go-site/
 repositories:
   - type: git
     prefix: safe-gateway-go-sdk
